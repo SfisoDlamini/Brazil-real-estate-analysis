@@ -1,0 +1,182 @@
+1.5. Housing in Brazil 🇧🇷
+
+# Import Matplotlib, pandas, and plot
+
+import pandas as pd 
+import matplotlib.pyplot as plt 
+Task 1.5.1
+
+df1=pd.read_csv("data/brasil-real-estate-1.csv")
+
+df1.head()
+property_type	place_with_parent_names	region	lat-lon	area_m2	price_usd
+0	apartment	|Brasil|Alagoas|Maceió|	Northeast	-9.6443051,-35.7088142	110.0	$187,230.85
+1	apartment	|Brasil|Alagoas|Maceió|	Northeast	-9.6430934,-35.70484	65.0	$81,133.37
+2	house	|Brasil|Alagoas|Maceió|	Northeast	-9.6227033,-35.7297953	211.0	$154,465.45
+3	apartment	|Brasil|Alagoas|Maceió|	Northeast	-9.622837,-35.719556	99.0	$146,013.20
+4	apartment	|Brasil|Alagoas|Maceió|	Northeast	-9.654955,-35.700227	55.0	$101,416.71
+Task 1.5.2
+
+import pandas as pd
+df1.dropna(inplace=True)
+df1.head()
+property_type	place_with_parent_names	region	lat-lon	area_m2	price_usd
+0	apartment	|Brasil|Alagoas|Maceió|	Northeast	-9.6443051,-35.7088142	110.0	$187,230.85
+1	apartment	|Brasil|Alagoas|Maceió|	Northeast	-9.6430934,-35.70484	65.0	$81,133.37
+2	house	|Brasil|Alagoas|Maceió|	Northeast	-9.6227033,-35.7297953	211.0	$154,465.45
+3	apartment	|Brasil|Alagoas|Maceió|	Northeast	-9.622837,-35.719556	99.0	$146,013.20
+4	apartment	|Brasil|Alagoas|Maceió|	Northeast	-9.654955,-35.700227	55.0	$101,416.71
+Task 1.5.3
+
+df1[["lat", "lon"]] =df1["lat-lon"].str.split(",",expand=True).astype(float)
+Task 1.5.4
+
+df1["state"]=df1["place_with_parent_names"].str.split("|",expand=True)[2]
+
+df1[["place_with_parent_names","state"]].head()
+place_with_parent_names	state
+0	|Brasil|Alagoas|Maceió|	Alagoas
+1	|Brasil|Alagoas|Maceió|	Alagoas
+2	|Brasil|Alagoas|Maceió|	Alagoas
+3	|Brasil|Alagoas|Maceió|	Alagoas
+4	|Brasil|Alagoas|Maceió|	Alagoas
+**Task 1.5.5** 
+  Cell In[6], line 1
+    **Task 1.5.5**
+    ^
+SyntaxError: invalid syntax
+#Remove "$" and "," then convert to float 
+
+df1["price_usd"]=df1["price_usd"].str.replace("$","",regex=False).str.replace(",","",regex=False).astype(float)
+Task 1.5.6
+
+df1=df1.drop(columns=["lat-lon","place_with_parent_names"])
+df1.head()
+Task 1.5.7
+
+import pandas as pd 
+import matplotlib.pyplot as plt
+
+df2=pd.read_csv("data/brasil-real-estate-2.csv")
+
+df2.head()
+Task 1.5.8
+
+df2["price_usd"]=df2["price_brl"]/3.19
+Task 1.5.9
+
+df2.drop(columns=["price_brl"],inplace=True) 
+df2.dropna(inplace=True)
+
+df2.head()
+Task 1.5.10
+
+df=pd.concat([df1,df2])
+print("df shape:", df.shape)
+
+df.head()
+Explore
+import plotly.express as px
+
+fig = px.scatter_mapbox(
+    df,
+    lat="lat", 
+    lon="lon", 
+    center={"lat": -14.2, "lon": -51.9},  # Map will be centered on Brazil
+    width=600,
+    height=600,
+    hover_data=["price_usd"],  # Display price when hovering mouse over house
+)
+
+fig.update_layout(mapbox_style="open-street-map")
+
+fig.show()
+Task 1.5.11
+
+summary_stats =df[["area_m2","price_usd"]].describe()
+Slight Code Change
+In the following task, you'll notice a small change in how plots are created compared to what you saw in the lessons. While the lessons use the global matplotlib method like plt.plot(...), in this task, you are expected to use the object-oriented (OOP) API instead. This means creating your plots using fig, ax = plt.subplots() and then calling plotting methods on the ax object, such as ax.plot(...), ax.hist(...), or ax.scatter(...).
+
+If you're using pandas’ or seaborn’s built-in plotting methods (like df.plot() or sns.lineplot()), make sure to pass the ax=ax argument so that the plot is rendered on the correct axes.
+
+This approach is considered best practice and will be used consistently across all graded tasks that involve matplotlib.
+
+Task 1.5.12
+
+# Don't change the code below 👇
+fig,ax = plt.subplots(figsize=(6.4,4.8))
+
+# Build histogram
+ax.hist(df["price_usd"].head(20000))
+
+# Label axes
+ax.set_xlabel("Price [USD]")
+ax.set_ylabel("Frequency")
+
+# Add title
+ax.set_title("Distribution of Home Prices")
+
+plt.show()
+Task 1.5.13
+
+# Don't change the code below 👇
+fig, ax = plt.subplots()
+
+#Build box plot
+ax.boxplot(df["area_m2"],vert=False)
+
+# Label x-axis
+ax.set_xlabel("Area [sq meters]")
+# Add title
+ax.set_title("Distribution of Home Sizes")
+Task 1.5.14
+
+mean_price_by_region=df.groupby("region")["price_usd"].mean().sort_values(ascending=True)
+
+#run this cell mean_price_by_region
+Task 1.5.15
+
+# Don't change the code below 👇
+fig, ax = plt.subplots(figsize=(6.4,4.8))
+
+
+# Build bar chart, label axes, add title
+#Use the data variable, then .plot()
+mean_price_by_region.plot(kind="bar",ax=ax)
+
+ax.set_xlabel("Region")
+ax.set_ylabel("Mean Price [USD]")
+ax.set_title("Mean Home Price by Region")
+Task 1.5.16
+
+df_south=df[df["region"]=="South"]
+
+df_south.head()
+Task 1.5.17
+
+homes_by_state=df_south["state"].value_counts()
+
+homes_by_state.head()
+Task 1.5.18
+
+# Subset data
+df_south_rgs=df_south[df_south["state"]=="Rio Grande do Sul"]
+
+# Don't change the code below 👇
+fig, ax = plt.subplots()
+
+
+# Build scatter plot
+ax.scatter(x=df_south_rgs["area_m2"],y=df_south_rgs["price_usd"])
+
+# Label axes
+ax.set_xlabel("Area [sq meters]")
+ax.set_ylabel("Price [USD]")
+
+# Add title
+ax.set_title("Rio Grande do Sul: Price vs. Area")
+Task 1.5.19
+
+south_states_corr=df_south[df_south["state"]=="Parana"]
+["area_m2"].corr(df_south[df_south["state"]=="Parana]"["price_usd"])corr_rio_grande=df_south[df_south]
+south_states_corr
